@@ -68,20 +68,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           
-      - uses: bluwy/substitute-string-action@v1
-        id: image_name
-        with:
-          _input-text: ${{ github.repository }}
-          '/': '-'
-          
-      - run: echo ${{ steps.image_name.outputs.result }}
-      
-      - run: docker build . -t ${{ env.REGISTRY }}/${{ steps.image_name.outputs.result }}:${{ github.sha }}
+      - run: docker build . -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
       
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ steps.image_name.outputs.result }}:${{ github.sha }}'
+          image-ref: '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}'
           format: 'sarif'
           output: 'trivy-results.sarif'
 
@@ -90,4 +82,4 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-      - run: docker push ${{ env.REGISTRY }}/${{ steps.image_name.outputs.result }}:${{ github.sha }}
+      - run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
