@@ -41,7 +41,7 @@ jobs:
     - uses: bluwy/substitute-string-action@v1
       id: acr_image_name
       with:
-        _input-text: ${{ env.IMAGE_NAME }}
+        _input-text: $IMAGE_NAME
         '/': '-'
           
     - run: echo ${{ steps.acr_image_name.outputs.result }}
