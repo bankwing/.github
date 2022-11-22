@@ -2,13 +2,23 @@ name: cd
 
 on:
   workflow_call:
+    inputs:
+      appname:
+        required: true
+        type: string
+      image-name:
+        required: true
+        type: string
+      image-tag:
+        required: true
+        type: string
 
 env:
-  AZURE_WEBAPP_NAME: ${{ github.event.client_payload.appname }}    # set this to your application's name
+  AZURE_WEBAPP_NAME: ${{ inputs.appname }}    # set this to your application's name
   SRCREGISTRY: ghcr.io
   DSTREGISTRY: app1acr.azurecr.io
-  IMAGE_NAME: ${{ github.event.client_payload.imagename }}
-  IMAGE_TAG: ${{ github.event.client_payload.imagetag }}
+  IMAGE_NAME: ${{ inputs.image-name }}
+  IMAGE_TAG: ${{ inputs.image-tag }}
 
 permissions:
   contents: read
@@ -24,11 +34,12 @@ jobs:
         login-server: ${{ env.DSTREGISTRY }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
+        
     - uses: bluwy/substitute-string-action@v1
-        id: acr_image_name
-        with:
-          _input-text: ${{ env.IMAGE_NAME }}
-          '/': '-'
+      id: acr_image_name
+      with:
+        _input-text: ${{ env.IMAGE_NAME }}
+        '/': '-'
           
     - run: echo ${{ steps.acr_image_name.outputs.result }}
       
